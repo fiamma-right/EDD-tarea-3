@@ -13,9 +13,9 @@ typedef struct btreenode{
 }Node;
 
 
-struct btreenode BuildTree( float *,int *, float *, int *, int);
-struct btreenode Treebuilding(float *, int *, int , int, float *, int *, int, int);
-struct btreenode cargar_arbol(char *);
+struct btreenode* Treebuilding(float *, int *, int , int, float *, int *, int, int);
+struct btreenode* cargar_arbol(char *);
+struct btreenode* new_node(int, float);
 void insert( struct btreenode **, int, float );
 void delete( struct btreenode **, int );
 void search( struct btreenode **, int, struct btreenode **, struct btreenode **, int * );
@@ -28,11 +28,11 @@ int main(){
 	struct btreenode *root;
 	root = NULL;
 	fp = fopen("rutina.dat", "r");
-	fap =fopen("output.dat", "w+");
-	while(fscanf(fp, "%[^ \n]s", cmd)!= EOF){
-		if(strcmp("Cargar", cmd)){
+	fap =fopen("output.dat", "w");
+	while(fscanf(fp, "%[^ \n]", cmd)!= 0){
+		if(strcmp("Cargar", cmd)==0){
 			fscanf(fp, "%s", par);
-			*root = cargar_arbol(par);
+			root = cargar_arbol(par);
 			if(root != NULL)	
 				fprintf(fap, "Datos Cargados\n");
 			else
@@ -52,64 +52,66 @@ int main(){
 		}
 		else if(strcmp("Guardar", cmd)){
 			fscanf(fp, "%s", par);
+			return 0;
 		}
 	}
 	  
 	return 0;
 }
 
-struct btreenode BuildTree(float *InOrder,int *inorderName, float *PostOrder,int *postorderName, int size){
-  	int instart = 0;
-  	int inend = size-1;
-  	int poststart = 0;
-  	int postend = size -1;
-  	return Treebuilding(InOrder, inorderName, instart, inend, PostOrder, postorderName, poststart, postend);
+struct btreenode* new_node(int data, float val){
+	struct btreenode* n = (struct btreenode*) malloc(sizeof(struct btreenode));
+	n->data = data;
+	n->val = val;
+	n->rightchild = NULL;
+	n->leftchild = NULL;
+	return n;
 }
 
-struct btreenode Treebuilding(float *InOrder,int *inorderName, int instart, int inend,float *PostOrder, int *postorderName, int poststart,int  postend){
+struct btreenode* Treebuilding(float InOrder[],int inorderName[], int instart, int inend,float PostOrder[], int postorderName[], int poststart,int  postend){
 	int i;
-	struct btreenode *root = (struct btreenode*)malloc(sizeof(struct btreenode));  
 	if (instart > inend|| poststart > postend){
-		root = NULL;
-		return *root;
+		return NULL;
 		}
-	float rootvalue = PostOrder[postend];
-	int rootname = postorderName[postend];
-	root->val    = rootvalue;
-	root->data = rootname;
+	int rootname = postorderName[postend];	
+	struct btreenode* root = new_node(postorderName[postend],PostOrder[postend]); 
 	int k =0;
  
 	for (i=0; i < inend; i++){
 		if(inorderName[i] == rootname){
-		k=i;
+			k=i;
       		break;
     }
   }
 
-	*root->leftchild = Treebuilding (InOrder, inorderName, instart, k-1, PostOrder,postorderName, poststart, poststart+k-(instart+1));
-	*root->rightchild= Treebuilding (InOrder,inorderName, k+1, inend, PostOrder,postorderName, poststart+k-instart, postend);
+	root->leftchild = Treebuilding (InOrder, inorderName, instart, k-1, PostOrder,postorderName, poststart, poststart+k-(instart+1));
+	root->rightchild= Treebuilding (InOrder,inorderName, k+1, inend, PostOrder,postorderName, poststart+k-instart, postend);
   
-  return *root;
+  return root;
 }
 
-struct btreenode cargar_arbol(char *nombre){
+struct btreenode* cargar_arbol(char *nombre){
 	FILE* fp; int size, *inorderName, *postorderName;
 	float *inorder, *postorder; int i;
-	struct btreenode *root = (struct btreenode*)malloc(sizeof(struct btreenode));  
 	fp = fopen(nombre, "r");
 	fscanf(fp, "%d", &size);
 	inorder = (float*)malloc(sizeof(float)*size);
 	inorderName = (int*)malloc(sizeof(int)*size);
 	postorder = (float*)malloc(sizeof(float)*size);
 	postorderName = (int*)malloc(sizeof(int)*size);
+	
+	int instart = 0;
+  	int inend = size-1;
+  	int poststart = 0;
+  	int postend = size -1;
+  	
 	for(i=0; i<size; i++){
 		fscanf(fp, "Liceo %d | %f", &inorderName[i],  &inorder[i]);
 	}
-	for(i=0; i<size; i++){
+	for(i=0; i<size ; i++){
 		fscanf(fp, "Liceo %d | %f", &postorderName[i],  &postorder[i]);
   	}
-	*root = BuildTree(inorder, inorderName, postorder, postorderName, size);
-return *root;
+return Treebuilding(inorder, inorderName, instart, inend, postorder, postorderName, poststart, postend);
   
 }
 
@@ -120,7 +122,7 @@ void delete ( struct btreenode **root, int num )
 
     /* si el arbol esta vacio */
 if ( *root == NULL ){
-        printf ( "\nTree is empty" ) ;
+        printf ( "\narbol vacio" ) ;
         return ;
     }
 
