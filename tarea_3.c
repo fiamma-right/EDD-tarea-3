@@ -27,7 +27,10 @@ int main(){
 	int num; float val;
 	struct btreenode *root;
 	root = NULL;
-	fp = fopen("rutina.dat", "r");
+	if ((fp = fopen("rutina.dat", "r")) == 0){
+        	printf("Error al cargar el archivo rutina.dat\n");
+        	return 1;
+    	}
 	fap =fopen("output.dat", "w");
 	while(fscanf(fp, "%[^ \n]", cmd)!= 0){
 		if(strcmp("Cargar", cmd)==0){
@@ -93,7 +96,10 @@ struct btreenode* Treebuilding(float InOrder[],int inorderName[], int instart, i
 struct btreenode* cargar_arbol(char *nombre){
 	FILE* fp; int size, *inorderName, *postorderName;
 	float *inorder, *postorder; int i;
-	fp = fopen(nombre, "r");
+	if ((fp = fopen(nombre, "r")) == 0){
+        	printf("Error al cargar %c", nombre);
+        	return NULL;
+    }
 	fscanf(fp, "%d", &size);
 	inorder = (float*)malloc(sizeof(float)*size);
 	inorderName = (int*)malloc(sizeof(int)*size);
@@ -248,4 +254,6 @@ void buscar( struct btreenode **root, int num){
 		printf("Error: no existe Liceo %d", num);
 	}
 	return;
+}
+
 }
