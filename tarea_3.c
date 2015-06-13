@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define FALSE 0
 #define TRUE 1
@@ -14,14 +15,45 @@ typedef struct btreenode{
 
 struct btreenode BuildTree( float *,int *, float *, int *, int);
 struct btreenode Treebuilding(float *, int *, int , int, float *, int *, int, int);
-void insert( struct btreenode **, int );
+struct btreenode cargar_arbol(char *);
+void insert( struct btreenode **, int, float );
 void delete( struct btreenode **, int );
 void search( struct btreenode **, int, struct btreenode **, struct btreenode **, int * );
+void buscar(struct btreenode **, int);
 
 int main(){
-	FILE* fp;
-	char name[100], cmd[30], aux[10];
-	while(
+	FILE *fp, *fap;
+	char cmd[257], par[257];
+	int num; float val;
+	struct btreenode *root;
+	root = NULL;
+	fp = fopen("rutina.dat", "r");
+	fap =fopen("output.dat", "w+");
+	while(fscanf(fp, "%[^ \n]s", cmd)!= EOF){
+		if(strcmp("Cargar", cmd)){
+			fscanf(fp, "%s", par);
+			*root = cargar_arbol(par);
+			if(root != NULL)	
+				fprintf(fap, "Datos Cargados\n");
+			else
+				fprintf(fap, "No se pudo cargar datos\n"); 
+		}
+		else if(strcmp("Agregar", cmd)){
+			fscanf(fp, "Liceo %d|%f", &num, &val);
+			insert(&root, num, val);
+		}
+		else if(strcmp("Borrar", cmd)){
+			fscanf(fp, "Liceo %d", &num);
+			delete( &root, num);
+		}
+		else if(strcmp("Puntaje", cmd)){
+			fscanf(fp, "Liceo %d", &num);
+			buscar( &root, num); 
+		}
+		else if(strcmp("Guardar", cmd)){
+			fscanf(fp, "%s", par);
+		}
+	}
 	  
 	return 0;
 }
@@ -35,12 +67,14 @@ struct btreenode BuildTree(float *InOrder,int *inorderName, float *PostOrder,int
 }
 
 struct btreenode Treebuilding(float *InOrder,int *inorderName, int instart, int inend,float *PostOrder, int *postorderName, int poststart,int  postend){
-	int i; 
-	if (instart > inend|| poststart > postend)
-		return ;
+	int i;
+	struct btreenode *root = (struct btreenode*)malloc(sizeof(struct btreenode));  
+	if (instart > inend|| poststart > postend){
+		root = NULL;
+		return *root;
+		}
 	float rootvalue = PostOrder[postend];
 	int rootname = postorderName[postend];
-	struct btreenode *root = (struct btreenode*)malloc(sizeof(struct btreenode)); 
 	root->val    = rootvalue;
 	root->data = rootname;
 	int k =0;
@@ -58,10 +92,10 @@ struct btreenode Treebuilding(float *InOrder,int *inorderName, int instart, int 
   return *root;
 }
 
-struct btreenode *Cargar_arbol(char *nombre){
+struct btreenode cargar_arbol(char *nombre){
 	FILE* fp; int size, *inorderName, *postorderName;
 	float *inorder, *postorder; int i;
-	struct btreenode *root;
+	struct btreenode *root = (struct btreenode*)malloc(sizeof(struct btreenode));  
 	fp = fopen(nombre, "r");
 	fscanf(fp, "%d", &size);
 	inorder = (float*)malloc(sizeof(float)*size);
@@ -75,7 +109,7 @@ struct btreenode *Cargar_arbol(char *nombre){
 		fscanf(fp, "Liceo %d | %f", &postorderName[i],  &postorder[i]);
   	}
 	*root = BuildTree(inorder, inorderName, postorder, postorderName, size);
-return root;
+return *root;
   
 }
 
@@ -84,7 +118,7 @@ void delete ( struct btreenode **root, int num )
     int found ;
     struct btreenode *parent, *x, *xsucc ;
 
-    /* if tree is empty */
+    /* si el arbol esta vacio */
 if ( *root == NULL ){
         printf ( "\nTree is empty" ) ;
         return ;
@@ -92,17 +126,17 @@ if ( *root == NULL ){
 
     parent = x = NULL ;
 
-    /* call to search function to find the node to be deleted */
+    /* usa la funcion search para encontrar el nodo a eliminar*/
 
     search ( root, num, &parent, &x, &found ) ;
 
-    /* if the node to deleted is not found */
+    /* si no encuentra el nodo */
 if ( found == FALSE ){
-        printf ( "\nData to be deleted, not found" ) ;
+        printf ( "No se encontro nodo\n" ) ;
         return ;
     }
 
-    /* if the node to be deleted has two children */
+    /* si el nodo tiene 2 hijos */
 if ( x -> leftchild != NULL && x -> rightchild != NULL ){
         parent = x ;
         xsucc = x -> rightchild;
@@ -116,7 +150,7 @@ if ( x -> leftchild != NULL && x -> rightchild != NULL ){
         x = xsucc ;
     }
 
-    /* if the node to be deleted has no child */
+    /* si el nodo no tiene hijos */
 if ( x -> leftchild == NULL && x -> rightchild == NULL ){
         if ( parent -> rightchild == x )
             parent -> rightchild = NULL ;
@@ -127,7 +161,7 @@ if ( x -> leftchild == NULL && x -> rightchild == NULL ){
         return ;
     }
 
-    /* if the node to be deleted has only rightchild */
+    /* si el nodo tiene solo hijo en la derecha */
 if ( x -> leftchild == NULL && x -> rightchild != NULL ){
         if ( parent -> leftchild == x )
             parent -> leftchild = x -> rightchild ;
@@ -138,7 +172,7 @@ if ( x -> leftchild == NULL && x -> rightchild != NULL ){
         return ;
     }
 
-    /* if the node to be deleted has only left child */
+    /* si el nodo tiene solo hijo en la izquierda */
 if ( x -> leftchild != NULL && x -> rightchild == NULL ){
         if ( parent -> leftchild == x )
             parent -> leftchild = x -> leftchild ;
@@ -150,25 +184,21 @@ if ( x -> leftchild != NULL && x -> rightchild == NULL ){
     }
 }
 
-void insert ( struct btreenode **sr, int num )
+void insert ( struct btreenode **sr, int num, float prom )
 {
-    if ( *sr == NULL )
-    {
+    if ( *sr == NULL ){
         *sr = malloc ( sizeof ( struct btreenode ) ) ;
 
         ( *sr ) -> leftchild = NULL ;
         ( *sr ) -> data = num ;
+        ( *sr ) -> val = prom ; 
         ( *sr ) -> rightchild = NULL ;
     }
-    else/* search the node to which new node will be attached */
-
-    {
-        /* if new data is less, traverse to left */
-if ( num < ( *sr ) -> data )
-            insert ( &( ( *sr ) -> leftchild ), num ) ;
-        else/* else traverse to right */
-
-            insert ( &( ( *sr ) -> rightchild ), num ) ;
+    else{
+        if ( num < ( *sr ) -> data )
+        	insert ( &( ( *sr ) -> leftchild ), num, prom );
+        else
+            insert ( &( ( *sr ) -> rightchild ), num, prom ) ;
     }
 }
 
@@ -183,7 +213,6 @@ void search ( struct btreenode **root, int num, struct btreenode **par, struct
 
     while ( q != NULL )
     {
-        /* if the node to be deleted is found */
 if ( q -> data == num )
         {
             *found = TRUE ;
@@ -198,4 +227,23 @@ if ( q -> data == num )
         else
             q = q -> rightchild ;
     }
+}
+
+void buscar( struct btreenode **root, int num){
+	struct btreenode *act;
+	int found=FALSE;
+	act = *root;
+	while(act != NULL){
+		if( act-> data > num)
+			act = act -> leftchild;
+		else if (act -> data < num)
+			act = act -> rightchild;
+		else if(act-> data == num){
+			found = TRUE;
+			printf("Liceo %d: %f", act->data, act->val);		
+		}
+	if(found == FALSE)
+		printf("Error: no existe Liceo %d", num);
+	}
+	return;
 }
