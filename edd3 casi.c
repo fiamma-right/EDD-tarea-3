@@ -27,39 +27,36 @@ int main(){
 	int num = 0  ; float val;
 	struct btreenode *root = NULL;
 	if ((fp = fopen("rutina.dat", "r")) == 0){
-        	printf("Error al cargar el archivo rutina.dat\n");
+        	printf("Gomenne :c\nError al cargar el archivo rutina.dat\n");
         	return 1;
     	}
-	if ((fap = fopen("output.dat", "w")) == 0){
-        	printf("Error al cargar el archivo\n");
-        	return 1;
-    	}
+	fap = fopen("output.dat", "w") /* No es necesario validar la apertura de este archivo, porque se crea */
 	while(fscanf(fp, "%[^ \n]", cmd)!= 0){
 		if(strcmp("Cargar", cmd)==0){
 			fscanf(fp, "%s\n", par);
 			root = cargar_arbol(par);
 			printf("hello world\n");
 			if(root != NULL)
-				fprintf(fap, "Datos Cargados\n");
+				fprintf(fap, "Onii-chan, Datos Cargados :3\n");
 			else
-				fprintf(fap, "No se pudo cargar datos\n"); 
+				fprintf(fap, "Gomenne Onii-chan, no se pudieron cargar datos :C\n"); 
 		}
-		else if(strcmp("Agregar", cmd)){
+		else if((strcmp("Agregar", cmd) == 0)){
 			fscanf(fp, "Liceo %d|%f\n", &num , &val);
 			insert(&root, num, val);
-			fprintf(fap , "Liceo %d Agregado\n", num);
+			fprintf(fap , "Omedetto, Onii-chan!!! Liceo %d Agregado\n", num);
 		}
-		else if(strcmp("Borrar", cmd)){
+		else if((strcmp("Borrar", cmd)==0)){
 			fscanf(fp, "Liceo %d\n", &num);
 			delete( &root, num);
-			fprintf(fap ,"Liceo %d Eliminado\n", num);
+			fprintf(fap ,"Nani? Nande? Mazaka!! Liceo %d ha sido Eliminado!!!\n", num);
 		}
-		else if(strcmp("Puntaje", cmd)){
+		else if((strcmp("Puntaje", cmd)==0)){
 			fscanf(fp, "Liceo %d\n", &num);
 			val = buscar( &root, num); 
-			fprintf(fap, "Puntaje Liceo %d : %f\n", num, val);
+			fprintf(fap, "Puntaje Liceo %d : %f (Tryhard)\n", num, val);
 		}
-		else if(strcmp("Guardar", cmd)){
+		else if((strcmp("Guardar", cmd)==0)){
 			fscanf(fp, "%s\n", par);
 			return 0;
 		}
@@ -102,7 +99,7 @@ struct btreenode *cargar_arbol(char *nombre){
 	FILE* file; int size, *inorderName, *postorderName;
 	float *inorder, *postorder; int i;
 	if ((file = fopen(nombre, "r")) == 0){
-        	printf("Error al cargar %s", nombre);
+        	printf("THIS CAN NOT BE!!! ONII-CHAN!!! Error al cargar %s", nombre);
         	return NULL;
     }
 	fscanf(file, "%d\n", &size);
@@ -147,7 +144,7 @@ if ( *root == NULL ){
 
     /* si no encuentra el nodo */
 if ( found == FALSE ){
-        printf ( "No se encontro nodo\n" ) ;
+        printf ( "No se encontro nodo, pero por otro lado estos noodles estan deliciosos\n" ) ;
         return ;
     }
 
