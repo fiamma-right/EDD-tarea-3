@@ -39,7 +39,6 @@ int main(){
 		if(strcmp("Cargar", cmd)==0){
 			fscanf(fp, "%s\n", par);
 			root = cargar_arbol(par);
-			printf("hello world\n");
 			if(root != NULL)
 				fprintf(fap, "Onii-chan, Datos Cargados :3\n");
 			else
@@ -277,7 +276,7 @@ void inordert(struct btreenode *node, FILE *fp){
 	if (node == NULL)
 		return;
 	inordert(node-> leftchild, fp);
-	fprintf(fp,"Liceo %d | %f\n", node->data, node-> val);
+	fprintf(fp,"Liceo %d | %.1f\n", node->data, node-> val);
 	inordert(node->rightchild, fp);
 }
 
@@ -287,7 +286,7 @@ void postordert(struct btreenode *node, FILE *fp){
 	
 	postordert(node->leftchild, fp);
 	postordert(node-> rightchild, fp);
-	fprintf(fp,"Liceo %d | %f\n", node->data, node-> val);	
+	fprintf(fp,"Liceo %d | %.1f\n", node->data, node-> val);	
 	
 }
 
@@ -300,5 +299,5 @@ void guardar(struct btreenode * root, char *nombre){
 	postordert(root, fp);
 	inordert(root, fp);
 	
-
+	return;
 }
