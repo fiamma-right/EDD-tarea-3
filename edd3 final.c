@@ -45,7 +45,7 @@ int main(){
 				fprintf(fap, "Gomenne Onii-chan, no se pudieron cargar datos :C\n"); 
 		}
 		else if((strcmp("Agregar", cmd) == 0)){
-			fscanf(fp, "Liceo %d|%f\n", &num , &val);
+			fscanf(fp, "Liceo %d | %f\n", &num , &val);
 			insert(&root, num, val);
 			fprintf(fap , "Omedetto, Onii-chan!!! Liceo %d Agregado\n", num);
 		}
@@ -124,7 +124,6 @@ struct btreenode *cargar_arbol(char *nombre){
 		fscanf(file, "Liceo %d | %f\n", &inorderName[i],  &inorder[i]);
   	}
 	fclose(file);
-
 	return Treebuilding(inorder, inorderName, instart, inend, postorder, postorderName, poststart, postend);
   
 }
