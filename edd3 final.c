@@ -84,6 +84,8 @@ int main(){
 		else if((strcmp("Guardar", cmd)==0)){
 			fscanf(fp, "%s", par);
 			guardar(root, par);
+			fprintf(fap, "Datos Guardados");
+			fclose(fap); fclose(fp);
 			return 0;
 		}
 	}
